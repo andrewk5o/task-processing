@@ -1,90 +1,145 @@
-<!--
-title: 'Serverless Framework Node Express API service backed by DynamoDB on AWS'
-description: 'This template demonstrates how to develop and deploy a simple Node Express API service backed by DynamoDB running on AWS Lambda using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-priority: 1
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Task Processing System
 
-# Serverless Framework Node Express API on AWS
+A serverless task processing system built with AWS Lambda, SQS, and DynamoDB that implements asynchronous task processing with exponential backoff retry and dead letter queue monitoring.
 
-This template demonstrates how to develop and deploy a simple Node Express API service, backed by DynamoDB table, running on AWS Lambda using the Serverless Framework.
+## Architecture
 
-This template configures a single function, `api`, which is responsible for handling all incoming requests using the `httpApi` event. To learn more about `httpApi` event configuration options, please refer to [httpApi event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/). As the event is configured in a way to accept all incoming requests, the Express.js framework is responsible for routing and handling requests internally. This implementation uses the `serverless-http` package to transform the incoming event request payloads to payloads compatible with Express.js. To learn more about `serverless-http`, please refer to the [serverless-http README](https://github.com/dougmoscrop/serverless-http).
+The system consists of the following components:
 
-Additionally, it also handles provisioning of a DynamoDB database that is used for storing data about users. The Express.js application exposes two endpoints, `POST /users` and `GET /user/:userId`, which create and retrieve a user record.
+- **API Gateway**: RESTful API endpoints for task management
+- **DynamoDB**: Task storage and status tracking
+- **SQS Queue**: Main task queue for asynchronous processing
+- **SQS Dead Letter Queue (DLQ)**: Stores failed tasks after max retries
+- **Lambda Functions**: 
+  - `taskProcessor`: Processes tasks from SQS with retry logic
+  - `dlqMonitor`: Monitors DLQ and logs failed tasks to CloudWatch
 
-## Usage
+## Features
 
-### Deployment
+- **Asynchronous Task Processing**: Tasks are queued and processed in the background
+- **Exponential Backoff Retry**: Failed tasks are retried with increasing delays
+- **Dead Letter Queue**: Unprocessable tasks are moved to DLQ after max retries (2)
+- **DLQ Monitoring**: Automated monitoring and logging of failed tasks
+- **Task Type Support**: Different task types with configurable processing logic
+- **Comprehensive Logging**: Detailed CloudWatch logs for debugging and monitoring
 
-Install dependencies with:
+## Task Structure
 
+Each task contains the following fields:
+
+- `taskId`: Unique identifier for the task
+- `answer`: Task data or answer content
+- `status`: Current status (Pending, COMPLETED, FAILED)
+- `retries`: Number of retry attempts (0-2)
+- `errorMessage`: Error details if task failed
+
+## API Endpoints
+
+### Create Task
 ```
+POST /tasks
+Content-Type: application/json
+
+{
+  "taskId": "unique-task-id",
+  "answer": "task answer or data"
+}
+```
+
+### Get All Tasks
+```
+GET /tasks
+```
+
+### Get Task by ID
+```
+GET /tasks/{taskId}
+```
+
+## Task Processing Flow
+
+1. **Task Creation**: Task is created via API and stored in DynamoDB with "Pending" status
+2. **Queue Processing**: Task message is sent to SQS queue
+3. **Task Processing**: `taskProcessor` Lambda consumes messages and processes tasks
+4. **Retry Logic**: Failed tasks are retried with exponential backoff (max 2 retries) - status remains "Pending" during retries
+5. **DLQ Routing**: Tasks exceeding max retries are moved to DLQ
+6. **Monitoring**: `dlqMonitor` Lambda runs every 5 minutes to process DLQ messages
+
+## Retry Strategy
+
+- **Base Delay**: 1 second
+- **Exponential Backoff**: Delay doubles with each retry attempt
+- **Jitter**: Random variation (±10%) to prevent thundering herd
+- **Max Delay**: Capped at 30 seconds
+- **Max Retries**: 2 attempts before moving to DLQ
+
+## Environment Variables
+
+- `TASKS_TABLE`: DynamoDB table name for task storage
+- `TASKS_QUEUE_URL`: SQS main queue URL
+- `TASKS_QUEUE_NAME`: SQS main queue name
+- `DLQ_URL`: SQS dead letter queue URL
+
+## Deployment
+
+```bash
+# Install dependencies
 npm install
-```
 
-and then deploy with:
-
-```
+# Deploy to AWS
 serverless deploy
+
+# Deploy to specific stage
+serverless deploy --stage dev
 ```
 
-After running deploy, you should see output similar to:
+## Monitoring
 
-```
-Deploying "aws-node-express-dynamodb-api" to stage "dev" (us-east-1)
+### CloudWatch Logs
 
-✔ Service deployed to stack aws-node-express-dynamodb-api-dev (109s)
+- **taskProcessor**: Task processing logs with retry information
+- **dlqMonitor**: DLQ monitoring logs with failed task details
 
-endpoint: ANY - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com
-functions:
-  api: aws-node-express-dynamodb-api-dev-api (3.8 MB)
-```
+### Key Metrics
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [`httpApi` event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/). Additionally, in current configuration, the DynamoDB table will be removed when running `serverless remove`. To retain the DynamoDB table even after removal of the stack, add `DeletionPolicy: Retain` to its resource definition.
+- Task processing success/failure rates
+- Retry attempt counts
+- DLQ message counts
+- Processing latency
 
-### Invocation
+## Local Development
 
-After successful deployment, you can create a new user by calling the corresponding endpoint:
+```bash
+# Install dependencies
+npm install
 
-```
-curl --request POST 'https://xxxxxx.execute-api.us-east-1.amazonaws.com/users' --header 'Content-Type: application/json' --data-raw '{"name": "John", "userId": "someUserId"}'
-```
+# Run locally with serverless offline
+npm run dev
 
-Which should result in the following response:
-
-```json
-{ "userId": "someUserId", "name": "John" }
-```
-
-You can later retrieve the user by `userId` by calling the following endpoint:
-
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/users/someUserId
+# Test API endpoints
+curl -X POST http://localhost:3000/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"taskId": "test-1", "answer": "test answer"}'
 ```
 
-Which should result in the following response:
+## Configuration
 
-```json
-{ "userId": "someUserId", "name": "John" }
-```
+The system can be configured via `serverless.yml`:
 
-### Local development
+- **Queue Settings**: Visibility timeout, message retention, max receive count
+- **Lambda Settings**: Memory, timeout, concurrency limits
+- **Monitoring**: DLQ monitor schedule (default: every 5 minutes)
 
-The easiest way to develop and test your function is to use the `dev` command:
+## Error Handling
 
-```
-serverless dev
-```
+- **Task Failures**: Logged with detailed error information
+- **Queue Errors**: Handled gracefully with CloudWatch logging
+- **DynamoDB Errors**: Retried with exponential backoff
+- **SQS Errors**: Logged and handled appropriately
 
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
+## Security
 
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
-
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+- IAM roles with least privilege access
+- Environment variable configuration
+- Secure SQS message handling
+- CloudWatch logging for audit trails

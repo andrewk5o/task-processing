@@ -9,6 +9,7 @@ stages:
   default:
     params:
       tableName: "tasks-table-${sls:stage}"
+      queueName: "tasks-queue-${sls:stage}"
 
 provider:
   name: aws
@@ -30,12 +31,26 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - Fn::GetAtt: [TasksTable, Arn]
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:GetQueueAttributes
+            - sqs:GetQueueUrl
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:ChangeMessageVisibility
+          Resource:
+            - Fn::GetAtt: [TasksQueue, Arn]
+            # - Fn::GetAtt: [TasksDeadLetterQueue, Arn]
   environment:
     TASKS_TABLE: ${param:tableName}
+    TASKS_QUEUE_URL:
+      Ref: TasksQueue
+    TASKS_QUEUE_NAME: ${param:queueName}
 
 functions:
   api:
-    handler: handler.handler
+    handler: functions/api/index.handler
     events:
       - httpApi:
           path: /tasks
@@ -46,6 +61,30 @@ functions:
       - httpApi:
           path: /tasks
           method: POST
+
+  # taskProcessor:
+  #   handler: functions/taskProcessor/index.handler
+  #   events:
+  #     - sqs:
+  #         arn:
+  #           Fn::GetAtt: [TasksQueue, Arn]
+  #         batchSize: 1
+  #   environment:
+  #     TASKS_TABLE: ${param:tableName}
+  #     TASKS_QUEUE_URL:
+  #       Ref: TasksQueue
+  #     TASKS_QUEUE_NAME: ${param:queueName}
+
+  # dlqMonitor:
+  #   handler: functions/dlqMonitor/index.handler
+  #   events:
+  #     - schedule:
+  #         rate: rate(5 minutes)
+  #         enabled: true
+  #   environment:
+  #     TASKS_TABLE: ${param:tableName}
+  #     DLQ_URL:
+  #       Ref: TasksDeadLetterQueue
 
 resources:
   Resources:
@@ -60,3 +99,20 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:tableName}
+
+    TasksQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${param:queueName}
+        VisibilityTimeout: 30
+        MessageRetentionPeriod: 1209600
+        # RedrivePolicy:
+        #   deadLetterTargetArn:
+        #     Fn::GetAtt: [TasksDeadLetterQueue, Arn]
+        #   maxReceiveCount: 3
+
+    # TasksDeadLetterQueue:
+    #   Type: AWS::SQS::Queue
+    #   Properties:
+    #     QueueName: "${param:queueName}-dlq"
+    #     MessageRetentionPeriod: 1209600
