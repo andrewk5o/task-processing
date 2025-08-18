@@ -8,21 +8,16 @@ const TASKS_TABLE = process.env.TASKS_TABLE;
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
 
-const getAllTasks = async (req, res) => {
-    const params = {
-        TableName: TASKS_TABLE,
-    };
-
+const getTasks = async (req, res) => {
     try {
-        const command = new ScanCommand(params);
-        const { Items } = await docClient.send(command);
-        res.json({ tasks: Items || [] });
+        const { Items } = await docClient.send(new ScanCommand({
+            TableName: TASKS_TABLE,
+        }));
+        res.json(Items || []);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Could not retrieve tasks" });
     }
 };
 
-module.exports = {
-    getAllTasks,
-};
+module.exports = getTasks;

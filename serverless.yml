@@ -62,18 +62,18 @@ functions:
           path: /tasks
           method: POST
 
-  # taskProcessor:
-  #   handler: functions/taskProcessor/index.handler
-  #   events:
-  #     - sqs:
-  #         arn:
-  #           Fn::GetAtt: [TasksQueue, Arn]
-  #         batchSize: 1
-  #   environment:
-  #     TASKS_TABLE: ${param:tableName}
-  #     TASKS_QUEUE_URL:
-  #       Ref: TasksQueue
-  #     TASKS_QUEUE_NAME: ${param:queueName}
+  taskProcessor:
+    handler: functions/taskProcessor/index.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [TasksQueue, Arn]
+          batchSize: 1
+    environment:
+      TASKS_TABLE: ${param:tableName}
+      TASKS_QUEUE_URL:
+        Ref: TasksQueue
+      TASKS_QUEUE_NAME: ${param:queueName}
 
   # dlqMonitor:
   #   handler: functions/dlqMonitor/index.handler

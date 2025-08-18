@@ -1,9 +1,4 @@
 const createTask = require('./createTask');
-const getAllTasks = require('./getAllTasks');
-const getTask = require('./getTask');
+const getTasks = require('./getTasks');
 
-module.exports = {
-    createTask,
-    getAllTasks,
-    getTask,
-};
+module.exports = { createTask, getTasks };

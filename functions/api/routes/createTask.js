@@ -16,12 +16,11 @@ async function sendTaskMessage(taskId) {
             timestamp: new Date().toISOString()
         };
 
-        const messageParams = {
+        const result = await sqsClient.send(new SendMessageCommand({
             QueueUrl: process.env.TASKS_QUEUE_URL,
             MessageBody: JSON.stringify(messageBody)
-        };
+        }));
 
-        const result = await sqsClient.send(new SendMessageCommand(messageParams));
         console.log(`Message sent to SQS queue:`, result.MessageId);
         return result;
     } catch (error) {
@@ -55,13 +54,7 @@ const createTask = async (req, res) => {
 
         await sendTaskMessage(taskId);
 
-        res.status(201).json({
-            message: "Task created and queued for processing",
-            taskId,
-            status: "Pending",
-            queueUrl: process.env.TASKS_QUEUE_URL,
-            task: taskItem
-        });
+        res.status(201).json(taskItem);
 
     } catch (error) {
         console.error('Error creating task:', error);
@@ -69,6 +62,4 @@ const createTask = async (req, res) => {
     }
 };
 
-module.exports = {
-    createTask,
-};
+module.exports = createTask;
