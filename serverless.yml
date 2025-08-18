@@ -41,12 +41,14 @@ provider:
             - sqs:ChangeMessageVisibility
           Resource:
             - Fn::GetAtt: [TasksQueue, Arn]
-            # - Fn::GetAtt: [TasksDeadLetterQueue, Arn]
+            - Fn::GetAtt: [TasksDeadLetterQueue, Arn]
   environment:
     TASKS_TABLE: ${param:tableName}
     TASKS_QUEUE_URL:
       Ref: TasksQueue
     TASKS_QUEUE_NAME: ${param:queueName}
+    TASKS_DLQ_URL:
+      Ref: TasksDeadLetterQueue
 
 functions:
   api:
@@ -74,17 +76,8 @@ functions:
       TASKS_QUEUE_URL:
         Ref: TasksQueue
       TASKS_QUEUE_NAME: ${param:queueName}
-
-  # dlqMonitor:
-  #   handler: functions/dlqMonitor/index.handler
-  #   events:
-  #     - schedule:
-  #         rate: rate(5 minutes)
-  #         enabled: true
-  #   environment:
-  #     TASKS_TABLE: ${param:tableName}
-  #     DLQ_URL:
-  #       Ref: TasksDeadLetterQueue
+      TASKS_DLQ_URL:
+        Ref: TasksDeadLetterQueue
 
 resources:
   Resources:
@@ -106,13 +99,13 @@ resources:
         QueueName: ${param:queueName}
         VisibilityTimeout: 30
         MessageRetentionPeriod: 1209600
-        # RedrivePolicy:
-        #   deadLetterTargetArn:
-        #     Fn::GetAtt: [TasksDeadLetterQueue, Arn]
-        #   maxReceiveCount: 3
+        RedrivePolicy:
+          deadLetterTargetArn:
+            Fn::GetAtt: [TasksDeadLetterQueue, Arn]
+          maxReceiveCount: 3
 
-    # TasksDeadLetterQueue:
-    #   Type: AWS::SQS::Queue
-    #   Properties:
-    #     QueueName: "${param:queueName}-dlq"
-    #     MessageRetentionPeriod: 1209600
+    TasksDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: "${param:queueName}-dlq"
+        MessageRetentionPeriod: 1209600
