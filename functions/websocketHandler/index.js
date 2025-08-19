@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand, DeleteCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, PutCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient());
 const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE || 'websocket-connections';

@@ -1,25 +1,18 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, QueryCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient());
 const CONNECTIONS_TABLE = process.env.CONNECTIONS_TABLE || 'websocket-connections';
 
 async function getAllActiveConnections() {
     try {
-        const { Items } = await dynamoDb.send(new ScanCommand({
+        const { Items } = await dynamoDb.send(new QueryCommand({
             TableName: CONNECTIONS_TABLE,
-            FilterExpression: '#connStatus = :connStatus',
-            ExpressionAttributeNames: {
-                '#connStatus': 'status'
-            },
-            ExpressionAttributeValues: {
-                ':connStatus': 'active'
-            }
         }));
 
         return Items || [];
     } catch (error) {
-        console.error('Error getting active connections:', error);
+        console.error('Error getting connections:', error);
         return [];
     }
 }

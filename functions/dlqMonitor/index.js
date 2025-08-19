@@ -10,7 +10,6 @@ exports.handler = async (event) => {
     try {
         console.log('=== DLQ MONITOR STARTED ===');
 
-        // Get DLQ message count
         const queueAttributes = await sqs.send(new GetQueueAttributesCommand({
             QueueUrl: process.env.TASKS_DLQ_URL,
             AttributeNames: ['ApproximateNumberOfMessages']
@@ -24,7 +23,6 @@ exports.handler = async (event) => {
             return { message: 'DLQ is empty' };
         }
 
-        // Process up to 10 failed messages
         const receiveResult = await sqs.send(new ReceiveMessageCommand({
             QueueUrl: process.env.TASKS_DLQ_URL,
             MaxNumberOfMessages: Math.min(messageCount, 10),

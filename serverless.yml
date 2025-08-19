@@ -22,7 +22,6 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:Query
-            - dynamodb:Scan
             - dynamodb:GetItem
             - dynamodb:PutItem
             - dynamodb:UpdateItem
@@ -67,7 +66,6 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:Query
-            - dynamodb:Scan
             - dynamodb:GetItem
             - dynamodb:PutItem
             - dynamodb:UpdateItem
@@ -195,9 +193,18 @@ resources:
         AttributeDefinitions:
           - AttributeName: connectionId
             AttributeType: S
+          - AttributeName: status
+            AttributeType: S
         KeySchema:
           - AttributeName: connectionId
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: StatusIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
 WebsocketsApi:
   Type: AWS::ApiGatewayV2::Api
   Properties:
