@@ -1,9 +1,23 @@
 [
   {
-    "taskId": "task-001",
-    "answer": "The capital of France is Paris",
+    "taskId": "1234",
+    "answer": "Answer text",
     "status": "Processed",
-    "retries": 0,
+    "retries": 2,
+    "errorMessage": null
+  },
+  {
+    "taskId": "1235",
+    "answer": "Answer text",
+    "status": "Failed",
+    "retries": 2,
+    "errorMessage": "Error message"
+  },
+  {
+    "taskId": "1236",
+    "answer": "Answer text",
+    "status": "Pending",
+    "retries": 2,
     "errorMessage": null
   }
 ]

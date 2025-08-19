@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, computed } from '@angular/core';
 import { input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
-export type BadgeStatus = 'Processed' | 'Failed' | 'Pending';
+export type BadgeStatus = string;
 
 @Component({
   selector: 'app-status-badge',

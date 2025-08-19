@@ -1,0 +1,123 @@
+// Task card design matching Figma Dashboard view
+.task-card {
+    background: #FFFFFF;
+    border: 1px solid #E0E1E5;
+    border-radius: 8px;
+    box-shadow: 0px 4px 16px 0px rgba(51, 57, 105, 0.06), 0px -1px 2px 0px rgba(51, 57, 105, 0.08);
+    overflow: hidden;
+    margin-bottom: 0;
+    transition: all 0.2s ease-in-out;
+
+    // Mobile-specific improvements
+    @media (max-width: 768px) {
+
+        // Touch-friendly improvements
+        @media (hover: none) and (pointer: coarse) {
+            &:active {
+                transform: scale(0.98);
+                box-shadow: 0px 2px 8px 0px rgba(51, 57, 105, 0.1), 0px -1px 2px 0px rgba(51, 57, 105, 0.08);
+            }
+        }
+    }
+}
+
+.card-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+// Header section with Task ID and Badge
+.card-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.task-id-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+// Field rows for Answer, Retries, Error message
+.field-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    // Ensure fixed height for consistent layout (42px as per Figma)
+    min-height: 42px;
+    justify-content: flex-start;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+// Field labels - matching Figma specifications
+.field-label {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 1.4; // 16.8px
+    letter-spacing: 1.67%;
+    color: #6F7081;
+    text-transform: uppercase;
+    margin: 0;
+
+    // Fixed height for labels
+    height: 14px;
+    display: flex;
+    align-items: center;
+}
+
+// Field values - matching Figma specifications
+.field-value {
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.43; // ~20px
+    letter-spacing: 1.07%;
+    color: #292830;
+    margin: 0;
+
+    // Handle long text better
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+
+    // Flexible content area
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+}
+
+// Status badge improvements to match Figma
+:host ::ng-deep app-status-badge {
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: 'Lato', sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.43;
+        letter-spacing: 1.07%;
+        text-align: center;
+        height: 24px;
+        box-sizing: border-box;
+
+        // Icon styling within badge
+        mat-icon {
+            width: 16px;
+            height: 16px;
+            font-size: 16px;
+        }
+    }
+}

@@ -1,4 +1,12 @@
-<div class="table-container">
+<!-- Desktop Table View -->
+@if (shouldShowTable()) {
+<div class="table-container desktop-view">
+  @if (isLoading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Refreshing tasks...</p>
+  </div>
+  } @else {
   <table mat-table [dataSource]="tasks">
 
     <!-- Task ID Column -->
@@ -46,9 +54,13 @@
       <th mat-header-cell *matHeaderCellDef class="error-message-header">
         <div class="error-message-header-content">
           <span class="header-text">Error message</span>
-          <button class="refresh-button" (click)="refreshTasks()">
+          <button class="refresh-button" (click)="refreshTasks()" [disabled]="isLoading()">
             <mat-icon svgIcon="refresh" aria-hidden="false" aria-label="Refresh table"></mat-icon>
+            @if (isLoading()) {
+            Refreshing...
+            } @else {
             Refresh table
+            }
           </button>
         </div>
       </th>
@@ -61,4 +73,35 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
 
   </table>
+  }
 </div>
+}
+
+<!-- Mobile Cards View -->
+@if (shouldShowCards()) {
+<div class="mobile-view">
+  @if (isLoading()) {
+  <div class="mobile-loading-container">
+    <div class="loading-spinner"></div>
+    <p>Refreshing tasks...</p>
+  </div>
+  } @else {
+  <div class="mobile-cards-container">
+    @for (task of tasks; track task.taskId) {
+    <app-task-card [task]="task"></app-task-card>
+    }
+  </div>
+  }
+
+  <div class="mobile-footer">
+    <button class="mobile-refresh-button" (click)="refreshTasks()" type="button" [disabled]="isLoading()">
+      <mat-icon svgIcon="refresh"></mat-icon>
+      @if (isLoading()) {
+      Refreshing...
+      } @else {
+      Refresh table
+      }
+    </button>
+  </div>
+</div>
+}

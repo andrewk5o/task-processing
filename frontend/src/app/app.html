@@ -1,13 +1,68 @@
 <div class="page-container">
-  <!-- Left Column: Task Submission -->
-  <div class="task-column">
-    <app-tasks-submission-form></app-tasks-submission-form>
+  <!-- Desktop Layout: Side by side -->
+  <div class="desktop-layout">
+    <!-- Left Column: Task Submission -->
+    <div class="task-column">
+      <app-tasks-submission-form></app-tasks-submission-form>
+    </div>
+
+    <!-- Right Column: Dashboard -->
+    <div class="dashboard-column">
+      <div class="dashboard-wrapper">
+        <app-tasks-table></app-tasks-table>
+      </div>
+    </div>
   </div>
 
-  <!-- Right Column: Dashboard -->
-  <div class="dashboard-column">
-    <div class="dashboard-wrapper">
-      <app-tasks-table></app-tasks-table>
+  <!-- Mobile Layout: Navigation-based -->
+  <div class="mobile-layout">
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+      <div class="header-content">
+        <div class="logo-section">
+          <img src="assets/icons/rama_logo.svg" alt="Rama Logo" class="logo">
+          <div class="divider"></div>
+          <span class="page-title">{{ currentView() === 'form' ? 'Read aloud | Q1/3' : 'Dashboard' }}</span>
+        </div>
+        <button mat-icon-button class="menu-button" (click)="toggleMenu()">
+          <mat-icon svgIcon="menu-alt-3"></mat-icon>
+        </button>
+      </div>
     </div>
+
+    <!-- Mobile Content Area -->
+    <div class="mobile-content">
+      @if (currentView() === 'form') {
+      <app-tasks-submission-form></app-tasks-submission-form>
+      } @else {
+      <app-tasks-table></app-tasks-table>
+      }
+    </div>
+
+    <!-- Mobile Navigation Menu -->
+    @if (showMenu()) {
+    <div class="mobile-menu-overlay" (click)="closeMenu()">
+      <div class="mobile-menu" (click)="$event.stopPropagation()">
+        <div class="menu-header">
+          <span class="menu-title">Menu</span>
+          <button mat-icon-button class="close-button" (click)="closeMenu()">
+            <mat-icon svgIcon="close"></mat-icon>
+          </button>
+        </div>
+
+        <div class="menu-items">
+          <button class="menu-item" [class.active]="currentView() === 'form'" (click)="switchView('form'); closeMenu()">
+            <mat-icon svgIcon="list"></mat-icon>
+            <span>Task Submission</span>
+          </button>
+
+          <button class="menu-item" [class.active]="currentView() === 'list'" (click)="switchView('list'); closeMenu()">
+            <mat-icon svgIcon="cog"></mat-icon>
+            <span>Dashboard</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    }
   </div>
 </div>
