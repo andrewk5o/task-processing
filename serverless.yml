@@ -1,8 +1,6 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+# Serverless Framework configuration for task-processing service
 org: andrewk5o
-# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
 app: task-processing
-# "service" is the name of this project. This will also be added to your AWS resource names.
 service: task-processing
 
 stages:
@@ -15,12 +13,12 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: eu-central-1
-  # Uncomment to easily set up a custom domain. Read the docs for more details:
-  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
-  # domain: api.example.com
+
+  # IAM permissions for the service
   iam:
     role:
       statements:
+        # DynamoDB permissions
         - Effect: Allow
           Action:
             - dynamodb:Query
@@ -31,6 +29,8 @@ provider:
             - dynamodb:DeleteItem
           Resource:
             - Fn::GetAtt: [TasksTable, Arn]
+
+        # SQS permissions for main queue and DLQ
         - Effect: Allow
           Action:
             - sqs:SendMessage
@@ -42,15 +42,26 @@ provider:
           Resource:
             - Fn::GetAtt: [TasksQueue, Arn]
             - Fn::GetAtt: [TasksDeadLetterQueue, Arn]
+
+        # CloudWatch Logs permissions for DLQ monitoring
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:DescribeLogGroups
+            - logs:DescribeLogStreams
+          Resource: "*"
+
+  # Environment variables for all functions
   environment:
     TASKS_TABLE: ${param:tableName}
     TASKS_QUEUE_URL:
       Ref: TasksQueue
-    TASKS_QUEUE_NAME: ${param:queueName}
-    TASKS_DLQ_URL:
-      Ref: TasksDeadLetterQueue
 
+# Function definitions
 functions:
+  # API Gateway functions
   api:
     handler: functions/api/index.handler
     events:
@@ -58,12 +69,14 @@ functions:
           path: /tasks
           method: GET
       - httpApi:
-          path: /tasks/{taskId}
-          method: GET
-      - httpApi:
           path: /tasks
           method: POST
+    environment:
+      TASKS_TABLE: ${param:tableName}
+      TASKS_QUEUE_URL:
+        Ref: TasksQueue
 
+  # Task processing function
   taskProcessor:
     handler: functions/taskProcessor/index.handler
     events:
@@ -75,24 +88,33 @@ functions:
       TASKS_TABLE: ${param:tableName}
       TASKS_QUEUE_URL:
         Ref: TasksQueue
-      TASKS_QUEUE_NAME: ${param:queueName}
       TASKS_DLQ_URL:
         Ref: TasksDeadLetterQueue
 
+  # DLQ monitoring function
+  dlqMonitor:
+    handler: functions/dlqMonitor/index.handler
+    events:
+      - schedule:
+          rate: rate(5 minutes)
+          enabled: true
+    environment:
+      TASKS_TABLE: ${param:tableName}
+      TASKS_DLQ_URL:
+        Ref: TasksDeadLetterQueue
+
+# AWS resources
 resources:
   Resources:
-    TasksTable:
-      Type: AWS::DynamoDB::Table
+    # Dead Letter Queue for failed tasks (must be created first)
+    TasksDeadLetterQueue:
+      Type: AWS::SQS::Queue
       Properties:
-        AttributeDefinitions:
-          - AttributeName: taskId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: taskId
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
-        TableName: ${param:tableName}
+        QueueName: "${param:queueName}-dlq"
+        MessageRetentionPeriod: 345600
+        VisibilityTimeout: 30
 
+    # Main SQS queue for incoming tasks
     TasksQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -104,8 +126,15 @@ resources:
             Fn::GetAtt: [TasksDeadLetterQueue, Arn]
           maxReceiveCount: 3
 
-    TasksDeadLetterQueue:
-      Type: AWS::SQS::Queue
+    # DynamoDB table for storing tasks
+    TasksTable:
+      Type: AWS::DynamoDB::Table
       Properties:
-        QueueName: "${param:queueName}-dlq"
-        MessageRetentionPeriod: 1209600
+        AttributeDefinitions:
+          - AttributeName: taskId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: taskId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:tableName}

@@ -1,15 +1,16 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, GetCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
-const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
 const { simulateTaskProcessing } = require('./utils');
-const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient());
-const sqs = new SQSClient();
+const { getTask, updateTaskToProcessed, updateTaskToFailed } = require('./dynamo');
+const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
+
 
 exports.handler = async (event) => {
     try {
+        console.log('=== TASK PROCESSOR STARTED ===');
+        console.log('Event:', JSON.stringify(event, null, 2));
+
+        // Process SQS messages
         for (const record of event.Records) {
             const messageBody = JSON.parse(record.body);
-
             const taskId = messageBody.taskId;
 
             if (!taskId) {
@@ -17,88 +18,31 @@ exports.handler = async (event) => {
                 continue;
             }
 
-            const { Item } = await dynamoDb.send(new GetCommand({
-                TableName: process.env.TASKS_TABLE,
-                Key: {
-                    taskId: taskId
-                }
-            }));
+            console.log(`Processing task: ${taskId}`);
+
+            const Item = await getTask(taskId);
 
             if (!Item) {
                 console.error(`Task with ID ${taskId} not found in DynamoDB`);
-                return {
-                    statusCode: 404,
-                    body: JSON.stringify({
-                        error: 'Task not found',
-                        taskId: taskId
-                    })
-                };
+                continue;
             }
 
-            const isSuccessful = await simulateTaskProcessing(Item.taskId, Item.retries || 0);
+            console.log(`Task found: ${Item.taskId}, current retries: ${Item.retries || 0}`);
 
-            if (isSuccessful) {
-                await dynamoDb.send(new UpdateCommand({
-                    TableName: process.env.TASKS_TABLE,
-                    Key: {
-                        taskId: Item.taskId
-                    },
-                    UpdateExpression: 'SET #status = :status',
-                    ExpressionAttributeNames: {
-                        '#status': 'status'
-                    },
-                    ExpressionAttributeValues: {
-                        ':status': 'Processed'
-                    }
-                }));
-                console.log(`Task ${Item.taskId} status updated to 'Processed'`);
-            } else {
-                const newRetryCount = Item.retries + 1;
-                if (newRetryCount >= 2) {
-                    console.log(`Task ${Item.taskId} sent to Dead Letter Queue (max retries exceeded: ${newRetryCount})`);
+            try {
+                await simulateTaskProcessing(Item.taskId);
 
-                    await sqs.send(new SendMessageCommand({
-                        QueueUrl: process.env.TASKS_DLQ_URL,
-                        MessageBody: JSON.stringify({
-                            taskId: Item.taskId,
-                            originalMessage: messageBody,
-                            failureReason: 'Max retries exceeded',
-                            retryCount: newRetryCount,
-                            timestamp: new Date().toISOString()
-                        })
-                    }));
+                // If we reach here, the task was successful
+                await updateTaskToProcessed(Item.taskId);
 
-                    console.log(`Task ${Item.taskId} successfully sent to DLQ`);
-                } else {
-                    console.log(`Task ${Item.taskId} returned to queue for retry attempt ${newRetryCount}`);
+            } catch (processingError) {
+                // Task failed - increment retry count
+                const newRetryCount = (Item.retries || 0) + 1;
+                await updateTaskToFailed(Item.taskId, newRetryCount, processingError.message);
+                console.log(`Task ${Item.taskId} failed - status updated to 'Failed', retry count: ${newRetryCount}, error: ${processingError.message}`);
 
-                    await dynamoDb.send(new UpdateCommand({
-                        TableName: process.env.TASKS_TABLE,
-                        Key: {
-                            taskId: Item.taskId
-                        },
-                        UpdateExpression: 'SET #status = :status, #retries = :retries',
-                        ExpressionAttributeNames: {
-                            '#status': 'status',
-                            '#retries': 'retries'
-                        },
-                        ExpressionAttributeValues: {
-                            ':status': 'Failed',
-                            ':retries': newRetryCount
-                        }
-                    }));
-
-                    await sqs.send(new SendMessageCommand({
-                        QueueUrl: process.env.TASKS_QUEUE_URL,
-                        MessageBody: JSON.stringify({
-                            taskId: Item.taskId,
-                            originalMessage: messageBody,
-                            failureReason: 'Failed to process task',
-                            retryCount: newRetryCount,
-                            timestamp: new Date().toISOString()
-                        })
-                    }));
-                }
+                // Re-throw the error to trigger SQS retry logic
+                throw processingError;
             }
         }
 
@@ -109,7 +53,9 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error('Error processing messages:', error);
+        console.error('Error in task processor:', error);
+
+        // Re-throw the error to let SQS handle retry logic
         throw error;
     }
 };
