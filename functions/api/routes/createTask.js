@@ -1,12 +1,6 @@
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const {
-    DynamoDBDocumentClient,
-    PutCommand,
-} = require("@aws-sdk/lib-dynamodb");
 const { SQSClient, SendMessageCommand } = require("@aws-sdk/client-sqs");
+const { createTask } = require("../dynamo");
 
-const dynamoClient = new DynamoDBClient();
-const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const sqsClient = new SQSClient();
 
 async function sendTaskMessage(taskId) {
@@ -29,7 +23,7 @@ async function sendTaskMessage(taskId) {
     }
 }
 
-const createTask = async (req, res) => {
+const createTaskHandler = async (req, res) => {
     const { taskId, answer } = req.body;
 
     if (typeof taskId !== "string") {
@@ -47,10 +41,7 @@ const createTask = async (req, res) => {
             errorMessage: null
         };
 
-        await docClient.send(new PutCommand({
-            TableName: process.env.TASKS_TABLE,
-            Item: taskItem
-        }));
+        await createTask(taskItem);
 
         await sendTaskMessage(taskId);
 
@@ -62,4 +53,4 @@ const createTask = async (req, res) => {
     }
 };
 
-module.exports = createTask;
+module.exports = createTaskHandler;

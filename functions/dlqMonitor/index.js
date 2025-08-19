@@ -5,9 +5,7 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient());
 
-/**
- * Simple DLQ monitor that checks for failed tasks and logs them to CloudWatch
- */
+
 exports.handler = async (event) => {
     try {
         console.log('=== DLQ MONITOR STARTED ===');

@@ -1,19 +1,9 @@
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const {
-    DynamoDBDocumentClient,
-    ScanCommand,
-} = require("@aws-sdk/lib-dynamodb");
-
-const TASKS_TABLE = process.env.TASKS_TABLE;
-const client = new DynamoDBClient();
-const docClient = DynamoDBDocumentClient.from(client);
+const { getAllTasks } = require("../dynamo");
 
 const getTasks = async (req, res) => {
     try {
-        const { Items } = await docClient.send(new ScanCommand({
-            TableName: TASKS_TABLE,
-        }));
-        res.json(Items || []);
+        const tasks = await getAllTasks();
+        res.json(tasks);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Could not retrieve tasks" });
