@@ -1,5 +1,14 @@
 @use '@angular/material' as mat;
 
+// CSS Variables for consistent values
+$mobile-breakpoint: 768px;
+$border-radius: 8px;
+$border-color: #E0E1E5;
+$background-light: #F9F9F9;
+$text-primary: #292830;
+$text-secondary: #6F7081;
+$primary-color: #5061D0;
+
 // Loading states
 .loading-container,
 .mobile-loading-container {
@@ -14,15 +23,15 @@
     margin-top: 16px;
     font-family: 'Lato', sans-serif;
     font-size: 14px;
-    color: #6F7081;
+    color: $text-secondary;
   }
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #E0E1E5;
-  border-top: 3px solid #5061D0;
+  border: 3px solid $border-color;
+  border-top: 3px solid $primary-color;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -43,14 +52,8 @@
   margin-bottom: 100px; // Account for fixed footer
 }
 
-// Responsive breakpoint variable
-$mobile-breakpoint: 768px;
-
 // Desktop table view
 .desktop-view {
-  // No display rules needed with conditional rendering
-
-  // Ensure table is hidden on mobile
   @media (max-width: $mobile-breakpoint) {
     display: none;
   }
@@ -58,9 +61,6 @@ $mobile-breakpoint: 768px;
 
 // Mobile cards view
 .mobile-view {
-  // No display rules needed with conditional rendering
-
-  // Ensure cards are hidden on desktop
   @media (min-width: #{$mobile-breakpoint + 1px}) {
     display: none;
   }
@@ -75,20 +75,9 @@ $mobile-breakpoint: 768px;
     height: 100%;
     max-height: calc(100vh - 160px); // Account for header and footer
 
-    // Ensure proper spacing on very small screens
-    @media (max-width: 375px) {
-      padding: 0 20px;
-    }
-
     // Touch-friendly improvements
     @media (hover: none) and (pointer: coarse) {
       gap: 16px; // Larger gap for touch devices
-    }
-
-    // Material Design elevation improvements
-    @media (max-width: 768px) {
-      // Transparent background for mobile dashboard
-      background: transparent;
     }
   }
 
@@ -98,10 +87,9 @@ $mobile-breakpoint: 768px;
     left: 0;
     right: 0;
     background: #FFFFFF;
-    border-top: 1px solid #E0E1E5;
+    border-top: 1px solid $border-color;
     box-shadow: 0px -3px 4px 0px rgba(51, 57, 105, 0.06);
-    padding: 16px 20px 16px 20px; // Symmetric padding for proper centering
-    border-radius: 0; // No border-radius
+    padding: 16px 20px;
     z-index: 100;
     display: flex;
     justify-content: center;
@@ -114,17 +102,17 @@ $mobile-breakpoint: 768px;
     justify-content: center;
     gap: 8px;
     width: 100%;
-    padding: 8px 16px; // Match Figma specifications
+    padding: 8px 16px;
     background: none;
-    border: 1px solid #5061D0;
-    border-radius: 8px;
-    color: #5061D0;
+    border: 1px solid $primary-color;
+    border-radius: $border-radius;
+    color: $primary-color;
     font-family: 'Lato', sans-serif;
     font-weight: 700;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    min-height: 36px; // Match Figma button height
+    min-height: 36px;
 
     &:hover:not(:disabled) {
       background-color: rgba(80, 97, 208, 0.1);
@@ -157,10 +145,6 @@ $mobile-breakpoint: 768px;
   }
 }
 
-
-
-
-
 .table-container {
   @include mat.table-overrides((header-container-height: 52px,
       row-item-container-height: 72px,
@@ -171,9 +155,9 @@ $mobile-breakpoint: 768px;
   font-size: 14px;
   line-height: 1.43;
   letter-spacing: 1.07%;
-  color: #292830;
-  border-radius: 8px;
-  border: 1px solid #E0E1E5;
+  color: $text-primary;
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
   overflow: auto;
   height: 100%;
 
@@ -187,8 +171,8 @@ $mobile-breakpoint: 768px;
   .mat-mdc-header-cell {
     border: none;
     padding: 0 16px;
-    border-bottom: 1px solid #E0E1E5;
-    background-color: #F9F9F9;
+    border-bottom: 1px solid $border-color;
+    background-color: $background-light;
     font-weight: 400;
     white-space: nowrap;
     overflow: hidden;
@@ -205,7 +189,7 @@ $mobile-breakpoint: 768px;
   }
 
   .mat-mdc-row:not(:last-child) .mat-mdc-cell {
-    border-bottom: 1px solid #E0E1E5;
+    border-bottom: 1px solid $border-color;
   }
 }
 
@@ -261,7 +245,7 @@ $mobile-breakpoint: 768px;
   padding: 8px 16px;
   background: none;
   border: none;
-  border-radius: 8px;
+  border-radius: $border-radius;
   color: #838598;
   font-family: 'Lato', sans-serif;
   font-weight: 700;
@@ -282,21 +266,5 @@ $mobile-breakpoint: 768px;
     width: 16px;
     height: 16px;
     color: #838598;
-  }
-}
-
-// Sticky refresh button
-.sticky-refresh {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 10;
-  background-color: rgba(249, 249, 249, 0.95);
-  backdrop-filter: blur(4px);
-  border: 1px solid #E0E1E5;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    background-color: rgba(249, 249, 249, 1);
   }
 }
