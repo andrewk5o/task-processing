@@ -53,11 +53,37 @@ provider:
             - logs:DescribeLogStreams
           Resource: "*"
 
+        # DynamoDB Streams permissions
+        - Effect: Allow
+          Action:
+            - dynamodb:GetRecords
+            - dynamodb:GetShardIterator
+            - dynamodb:DescribeStream
+            - dynamodb:ListStreams
+          Resource:
+            Fn::GetAtt: [TasksTable, StreamArn]
+
+        # WebSocket Connections Table permissions
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [WebSocketConnectionsTable, Arn]
+            - Fn::Sub: "${WebSocketConnectionsTable.Arn}/index/*"
+
   # Environment variables for all functions
   environment:
     TASKS_TABLE: ${param:tableName}
     TASKS_QUEUE_URL:
       Ref: TasksQueue
+    CONNECTIONS_TABLE: ${self:service}-${sls:stage}-websocket-connections
+    WEBSOCKET_ENDPOINT:
+      Fn::Sub: "https://${WebsocketsApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}"
 
 # Function definitions
 functions:
@@ -103,6 +129,26 @@ functions:
       TASKS_DLQ_URL:
         Ref: TasksDeadLetterQueue
 
+  streamProcessor:
+    handler: functions/streamProcessor/index.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [TasksTable, StreamArn]
+          batchSize: 1
+          startingPosition: LATEST
+
+  websocketHandler:
+    handler: functions/websocketHandler/index.handler
+    events:
+      - websocket:
+          route: $connect
+      - websocket:
+          route: $disconnect
+      - websocket:
+          route: $default
+
 # AWS resources
 resources:
   Resources:
@@ -138,3 +184,23 @@ resources:
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
         TableName: ${param:tableName}
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+    WebSocketConnectionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${sls:stage}-websocket-connections
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: connectionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: connectionId
+            KeyType: HASH
+WebsocketsApi:
+  Type: AWS::ApiGatewayV2::Api
+  Properties:
+    Name: ${self:service}-${sls:stage}-ws
+    ProtocolType: WEBSOCKET
+    RouteSelectionExpression: $request.body.action
