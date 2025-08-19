@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, PutCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 
 const dynamoDb = DynamoDBDocumentClient.from(new DynamoDBClient());
 
@@ -11,7 +11,7 @@ async function createTask(taskItem) {
 }
 
 async function getAllTasks() {
-    const { Items } = await dynamoDb.send(new QueryCommand({
+    const { Items } = await dynamoDb.send(new ScanCommand({
         TableName: process.env.TASKS_TABLE,
     }));
 
