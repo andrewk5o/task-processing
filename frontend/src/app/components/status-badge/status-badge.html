@@ -1,0 +1,18 @@
+<span [class]="badgeClasses()">
+  <!-- Processed: check-circle icon -->
+  @if (status() === 'Processed') {
+  <mat-icon class="badge-icon" svgIcon="check-circle"></mat-icon>
+  }
+
+  <!-- Failed: close-circle icon -->
+  @if (status() === 'Failed') {
+  <mat-icon class="badge-icon" svgIcon="close-circle"></mat-icon>
+  }
+
+  <!-- Pending: clock icon -->
+  @if (status() === 'Pending') {
+  <mat-icon class="badge-icon" svgIcon="clock"></mat-icon>
+  }
+
+  <span class="badge-text">{{ status() }}</span>
+</span>

@@ -1,0 +1,9 @@
+[
+  {
+    "taskId": "task-001",
+    "answer": "The capital of France is Paris",
+    "status": "Processed",
+    "retries": 0,
+    "errorMessage": null
+  }
+]

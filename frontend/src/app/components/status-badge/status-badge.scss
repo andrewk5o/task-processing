@@ -1,0 +1,65 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 2px 8px;
+    height: 24px;
+    width: 148px;
+    border-radius: 4px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.43;
+    letter-spacing: 0.15px;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    transition: all 0.2s ease-in-out;
+    cursor: default;
+    user-select: none;
+
+    .badge-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+    }
+
+    .badge-text {
+        font-family: 'Lato', sans-serif;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.43;
+        letter-spacing: 0.15px;
+    }
+
+    // Processed Badge - Light green background, dark green text and icon
+    &--processed {
+        background-color: #EBF7EA;
+        color: #2F8F2E;
+
+        .badge-icon {
+            color: #33AB30;
+        }
+    }
+
+    // Failed Badge - Light red background, dark red text and icon
+    &--failed {
+        background-color: #FCECE9;
+        color: #BD3827;
+
+        .badge-icon {
+            color: #E53F28;
+        }
+    }
+
+    // Pending Badge - Light blue background, dark blue text and icon
+    &--pending {
+        background-color: #E9F6FC;
+        color: #2687BE;
+
+        .badge-icon {
+            color: #47A4FA;
+        }
+    }
+}

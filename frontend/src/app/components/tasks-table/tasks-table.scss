@@ -1,0 +1,137 @@
+@use '@angular/material' as mat;
+
+.table-container {
+  @include mat.table-overrides((header-container-height: 52px,
+      row-item-container-height: 72px,
+      row-item-outline-color: transparent,
+    ));
+
+
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  line-height: 1.43;
+  letter-spacing: 1.07%;
+  color: #292830;
+  border-radius: 8px;
+  border: 1px solid #E0E1E5;
+  overflow: auto;
+  max-height: 80vh;
+
+  .mat-mdc-table {
+    border: none;
+    background: transparent;
+    min-width: 800px;
+    width: 100%;
+  }
+
+  .mat-mdc-header-cell {
+    border: none;
+    padding: 0 16px;
+    border-bottom: 1px solid #E0E1E5;
+    background-color: #F9F9F9;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mat-mdc-cell {
+    border: none;
+    padding: 16px;
+    background-color: #FFFFFF;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mat-mdc-row:not(:last-child) .mat-mdc-cell {
+    border-bottom: 1px solid #E0E1E5;
+  }
+}
+
+// Column widths
+.task-id-header,
+.task-id-cell {
+  min-width: 120px;
+  width: 120px;
+}
+
+.answer-header,
+.answer-cell {
+  min-width: 200px;
+  width: 200px;
+}
+
+.status-header,
+.status-cell {
+  min-width: 180px;
+  width: 180px;
+}
+
+.status-cell {
+  white-space: normal;
+  overflow: visible;
+}
+
+.retries-header,
+.retries-cell {
+  min-width: 80px;
+  width: 80px;
+}
+
+.error-message-header,
+.error-message-cell {
+  min-width: 200px;
+  width: 200px;
+}
+
+// Error message header content
+.error-message-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+// Refresh button styling
+.refresh-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: #838598;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: rgba(131, 133, 152, 0.1);
+  }
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    color: #838598;
+  }
+}
+
+// Sticky refresh button
+.sticky-refresh {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  background-color: rgba(249, 249, 249, 0.95);
+  backdrop-filter: blur(4px);
+  border: 1px solid #E0E1E5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: rgba(249, 249, 249, 1);
+  }
+}

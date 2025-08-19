@@ -1,0 +1,44 @@
+.app-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.app-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+// Badge Demo Styles
+.badge-demo {
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+
+    h2 {
+        margin: 0 0 1.5rem 0;
+        color: #1e293b;
+        font-size: 1.875rem;
+        font-weight: 600;
+    }
+
+    .demo-section {
+        margin-bottom: 2rem;
+
+        h3 {
+            margin: 0 0 1rem 0;
+            color: #475569;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .badge-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+    }
+}

@@ -1,0 +1,64 @@
+<div class="table-container">
+  <table mat-table [dataSource]="tasks">
+
+    <!-- Task ID Column -->
+    <ng-container matColumnDef="taskId">
+      <th mat-header-cell *matHeaderCellDef class="task-id-header">
+        Task ID
+      </th>
+      <td mat-cell *matCellDef="let element" class="task-id-cell">
+        {{element.taskId}}
+      </td>
+    </ng-container>
+
+    <!-- Answer Column -->
+    <ng-container matColumnDef="answer">
+      <th mat-header-cell *matHeaderCellDef class="answer-header">
+        Answer
+      </th>
+      <td mat-cell *matCellDef="let element" class="answer-cell">
+        {{element.answer}}
+      </td>
+    </ng-container>
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef class="status-header">
+        Status
+      </th>
+      <td mat-cell *matCellDef="let element" class="status-cell">
+        <app-status-badge [status]="element.status"></app-status-badge>
+      </td>
+    </ng-container>
+
+    <!-- Retries Column -->
+    <ng-container matColumnDef="retries">
+      <th mat-header-cell *matHeaderCellDef class="retries-header">
+        Retries
+      </th>
+      <td mat-cell *matCellDef="let element" class="retries-cell">
+        {{element.retries}}
+      </td>
+    </ng-container>
+
+    <!-- Error Message Column -->
+    <ng-container matColumnDef="errorMessage">
+      <th mat-header-cell *matHeaderCellDef class="error-message-header">
+        <div class="error-message-header-content">
+          <span class="header-text">Error message</span>
+          <button class="refresh-button" (click)="refreshTasks()">
+            <mat-icon svgIcon="refresh" aria-hidden="false" aria-label="Refresh table"></mat-icon>
+            Refresh table
+          </button>
+        </div>
+      </th>
+      <td mat-cell *matCellDef="let element" class="error-message-cell">
+        {{element.errorMessage || '-'}}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-header"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+  </table>
+</div>
