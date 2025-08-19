@@ -1,44 +1,33 @@
-.app-container {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.app-main {
+.page-container {
     display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    gap: 40px;
+    padding: 40px;
+    height: 100vh;
+    background: linear-gradient(112deg, rgba(63, 80, 195, 1) 4%, rgba(28, 41, 105, 1) 98%);
 }
 
-// Badge Demo Styles
-.badge-demo {
-    background: #f8fafc;
-    border-radius: 0.5rem;
-    padding: 2rem;
-    border: 1px solid #e2e8f0;
+.task-column {
+    min-width: 300px;
+    max-width: 660px;
+    width: 660px;
+    flex: 1;
+    height: calc(100vh - 80px);
+    /* Full height minus padding */
+}
 
-    h2 {
-        margin: 0 0 1.5rem 0;
-        color: #1e293b;
-        font-size: 1.875rem;
-        font-weight: 600;
-    }
+.dashboard-column {
+    min-width: 300px;
+    flex: 1;
+    height: calc(100vh - 80px);
+    /* Full height minus padding */
+}
 
-    .demo-section {
-        margin-bottom: 2rem;
-
-        h3 {
-            margin: 0 0 1rem 0;
-            color: #475569;
-            font-size: 1.25rem;
-            font-weight: 500;
-        }
-
-        .badge-examples {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
-        }
-    }
+.dashboard-wrapper {
+    background-color: #FBFAFD;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    min-width: 300px;
+    height: 100%;
+    box-sizing: border-box;
 }

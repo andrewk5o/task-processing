@@ -15,12 +15,12 @@
   border-radius: 8px;
   border: 1px solid #E0E1E5;
   overflow: auto;
-  max-height: 80vh;
+  height: 100%;
 
   .mat-mdc-table {
     border: none;
     background: transparent;
-    min-width: 800px;
+    min-width: 300px;
     width: 100%;
   }
 

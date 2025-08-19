@@ -1,19 +1,13 @@
-<div class="app-container">
-  <main class="app-main">
-    <!-- Badge Component Demo -->
-    <section class="badge-demo">
-      <h2>Status Badge Component Demo</h2>
+<div class="page-container">
+  <!-- Left Column: Task Submission -->
+  <div class="task-column">
+    <app-tasks-submission-form></app-tasks-submission-form>
+  </div>
 
-      <div class="demo-section">
-        <h3>Status Badges</h3>
-        <div class="badge-examples">
-          <app-status-badge status="Processed"></app-status-badge>
-          <app-status-badge status="Failed"></app-status-badge>
-          <app-status-badge status="Pending"></app-status-badge>
-        </div>
-      </div>
-    </section>
-
-    <app-tasks-table></app-tasks-table>
-  </main>
+  <!-- Right Column: Dashboard -->
+  <div class="dashboard-column">
+    <div class="dashboard-wrapper">
+      <app-tasks-table></app-tasks-table>
+    </div>
+  </div>
 </div>

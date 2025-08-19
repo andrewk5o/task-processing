@@ -8,27 +8,8 @@ import { DomSanitizer } from '@angular/platform-browser';
   selector: 'app-root',
   standalone: true,
   imports: [TasksSubmissionForm, TasksTable],
-  template: `
-    <main>
-      <h1>Task Processing</h1>
-      <app-tasks-submission-form></app-tasks-submission-form>
-      <app-tasks-table></app-tasks-table>
-    </main>
-  `,
-  styles: [`
-    main {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #292830;
-      font-family: 'Lato', sans-serif;
-    }
-  `]
+  templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
 export class App {
   private iconRegistry = inject(MatIconRegistry);

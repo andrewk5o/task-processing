@@ -1,1 +1,43 @@
-<p>tasks-submission-form works!</p>
+<form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="form-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="logo-container">
+      <img src="assets/icons/rama_logo.svg" alt="RAMA Logo" class="rama-logo">
+    </div>
+    <div class="divider"></div>
+    <div class="task-info">Read aloud | Q1/3</div>
+  </div>
+
+  <!-- Question Section -->
+  <div class="question-section">
+    <div class="question-content">
+      <div class="question-label">Question:</div>
+      <div class="question-text">
+        Lorem ipsum dolor sit amet consectetur. Et sagittis morbi accumsan ultricies eu rhoncus. Ultrices
+        rhoncus massa duis non id neque?
+      </div>
+    </div>
+  </div>
+
+  <!-- Answer Section -->
+  <div class="answer-section">
+    <div class="answer-content">
+      <div class="answer-label">Answer:</div>
+      <div class="input-container">
+        <textarea formControlName="answer" placeholder="Enter your answer" rows="4" class="answer-input"></textarea>
+        <div class="input-footer">
+          <span class="word-count">{{ getCharCount() }}/200</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <div class="footer-section">
+    <div class="button-container">
+      <button type="submit" class="submit-button" [disabled]="!taskForm.valid">
+        Submit
+      </button>
+    </div>
+  </div>
+</form>
