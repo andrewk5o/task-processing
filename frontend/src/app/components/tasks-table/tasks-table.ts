@@ -1,10 +1,12 @@
-import { Component, ChangeDetectionStrategy, signal, computed, effect, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import mockTasks from '../../mock-data/tasks.json';
+import { Component, ChangeDetectionStrategy, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
+import { isPlatformBrowser, AsyncPipe } from '@angular/common';
+import { Store } from '@ngxs/store';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { StatusBadge } from '../status-badge/status-badge';
 import { TaskCard } from '../task-card/task-card';
+import { TasksStoreState } from '../../tasks-store/tasks-store.state';
+import { TasksStoreActions } from '../../tasks-store/tasks-store.actions';
 
 export interface Task {
   taskId: string;
@@ -17,25 +19,26 @@ export interface Task {
 @Component({
   selector: 'app-tasks-table',
   standalone: true,
-  imports: [MatTableModule, MatIconModule, StatusBadge, TaskCard],
+  imports: [MatTableModule, MatIconModule, StatusBadge, TaskCard, AsyncPipe],
   templateUrl: './tasks-table.html',
   styleUrl: './tasks-table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TasksTable implements OnDestroy {
   private platformId = inject(PLATFORM_ID);
+  private store = inject(Store);
   private resizeHandler: (() => void) | null = null;
 
   displayedColumns: string[] = ['taskId', 'answer', 'status', 'retries', 'errorMessage'];
-  tasks = mockTasks;
 
-  // Responsive state
-  isMobile = signal(false);
-  isLoading = signal(false);
+  // State from NGXS store
+  tasks = this.store.select(TasksStoreState.getTasks);
+  isLoading = this.store.select(TasksStoreState.getIsLoading);
+  isMobile = this.store.select(TasksStoreState.getIsMobile);
 
   // Computed properties for responsive rendering
-  shouldShowTable = computed(() => !this.isMobile());
-  shouldShowCards = computed(() => this.isMobile());
+  shouldShowTable = this.store.select(TasksStoreState.shouldShowTable);
+  shouldShowCards = this.store.select(TasksStoreState.shouldShowCards);
 
   constructor() {
     // Only run on browser platform
@@ -53,19 +56,11 @@ export class TasksTable implements OnDestroy {
   }
 
   private checkScreenSize() {
-    this.isMobile.set(window.innerWidth <= 768);
+    const isMobile = window.innerWidth <= 768;
+    this.store.dispatch(new TasksStoreActions.SetIsMobile(isMobile));
   }
 
-  async refreshTasks() {
-    this.isLoading.set(true);
-
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      this.tasks = [...mockTasks];
-      console.log('Tasks refreshed');
-    } finally {
-      this.isLoading.set(false);
-    }
+  refreshTasks() {
+    this.store.dispatch(new TasksStoreActions.RefreshTasks());
   }
 }

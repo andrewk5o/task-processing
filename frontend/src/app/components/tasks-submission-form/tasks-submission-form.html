@@ -35,8 +35,12 @@
   <!-- Footer Section -->
   <div class="footer-section">
     <div class="button-container">
-      <button type="submit" class="submit-button" [disabled]="!taskForm.valid">
+      <button type="submit" class="submit-button" [disabled]="!taskForm.valid || (isLoading | async)">
+        @if (isLoading | async) {
+        Submitting...
+        } @else {
         Submit
+        }
       </button>
     </div>
   </div>

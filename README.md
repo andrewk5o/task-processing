@@ -98,6 +98,15 @@ The system follows an event-driven, serverless architecture pattern with the fol
 
 This will start all Lambda functions locally with mocked AWS services, allowing you to test the API endpoints and WebSocket connections without deploying to AWS.
 
+## 🎨 Frontend Application
+
+The project includes an application for task management and real-time status monitoring.
+
+### Frontend Documentation
+
+For detailed information about the frontend application, including component documentation, setup instructions, and development guidelines, see:
+
+📁 **[Frontend README](./frontend/README.md)**
 
 ## 🔧 API Endpoints
 

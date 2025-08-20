@@ -14,6 +14,22 @@ provider:
   runtime: nodejs20.x
   region: eu-central-1
 
+  httpApi:
+    cors:
+      allowedOrigins:
+        - http://localhost:4200
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - GET
+        - POST
+        - OPTIONS
+      allowCredentials: false
+
   # IAM permissions for the service
   iam:
     role:
