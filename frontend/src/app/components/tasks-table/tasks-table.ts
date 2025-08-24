@@ -27,7 +27,6 @@ export interface Task {
 export class TasksTable implements OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private store = inject(Store);
-  private resizeHandler: (() => void) | null = null;
 
   displayedColumns: string[] = ['taskId', 'answer', 'status', 'retries', 'errorMessage'];
 
@@ -43,19 +42,18 @@ export class TasksTable implements OnDestroy {
   constructor() {
     // Only run on browser platform
     if (isPlatformBrowser(this.platformId)) {
-      this.checkScreenSize();
-      this.resizeHandler = () => this.checkScreenSize();
-      window.addEventListener('resize', this.resizeHandler);
+      this.handleResize();
+      window.addEventListener('resize', this.handleResize);
     }
   }
 
   ngOnDestroy() {
-    if (isPlatformBrowser(this.platformId) && this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('resize', this.handleResize);
     }
   }
 
-  private checkScreenSize() {
+  private handleResize() {
     const isMobile = window.innerWidth <= 768;
     this.store.dispatch(new TasksStoreActions.SetIsMobile(isMobile));
   }

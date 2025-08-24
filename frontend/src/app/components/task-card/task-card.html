@@ -1,32 +1,32 @@
 <div class="task-card">
-    <div class="card-content">
-        <!-- Header section with Task ID and Status Badge -->
-        <div class="card-header-section">
-            <div class="task-id-section">
-                <span class="field-label">Task ID</span>
-                <span class="field-value">{{ task().taskId }}</span>
-            </div>
-            <app-status-badge [status]="task().status"></app-status-badge>
-        </div>
-
-        <!-- Answer section -->
-        <div class="field-row">
-            <span class="field-label">Answer</span>
-            <span class="field-value">{{ task().answer }}</span>
-        </div>
-
-        <!-- Retries section -->
-        <div class="field-row">
-            <span class="field-label">Retries</span>
-            <span class="field-value">{{ task().retries }}</span>
-        </div>
-
-        <!-- Error message section (only if exists) -->
-        @if (task().errorMessage) {
-        <div class="field-row">
-            <span class="field-label">Error message</span>
-            <span class="field-value">{{ task().errorMessage }}</span>
-        </div>
-        }
+  <div class="card-content">
+    <!-- Header section with Task ID and Status Badge -->
+    <div class="card-header-section">
+      <div class="task-id-section">
+        <span class="field-label">Task ID</span>
+        <span class="field-value">{{ task().taskId }}</span>
+      </div>
+      <app-status-badge [status]="task().status"></app-status-badge>
     </div>
+
+    <!-- Answer section -->
+    <div class="field-row">
+      <span class="field-label">Answer</span>
+      <span class="field-value">{{ task().answer }}</span>
+    </div>
+
+    <!-- Retries section -->
+    <div class="field-row">
+      <span class="field-label">Retries</span>
+      <span class="field-value">{{ task().retries }}</span>
+    </div>
+
+    <!-- Error message section (only if exists) -->
+    @if (task().errorMessage) {
+    <div class="field-row">
+      <span class="field-label">Error message</span>
+      <span class="field-value">{{ task().errorMessage }}</span>
+    </div>
+    }
+  </div>
 </div>
