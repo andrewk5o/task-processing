@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { State, Action, Selector, StateContext, Store } from '@ngxs/store';
-import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { TasksStoreActions } from './tasks-store.actions';
 import { Task } from '../components/tasks-table/tasks-table';
+import { TasksApiService, WebSocketMessage } from '../services/tasks-api.service';
+import { tryCatch } from '../utils/try-catch';
 
 export interface TasksStoreStateModel {
   tasks: Task[];
@@ -25,11 +26,8 @@ export interface TasksStoreStateModel {
 })
 @Injectable()
 export class TasksStoreState {
-  private http = inject(HttpClient);
   private store = inject(Store);
-  private apiUrl = 'https://3ac9xpts03.execute-api.eu-central-1.amazonaws.com/tasks';
-  private websocketUrl = 'wss://8pd3n4iow3.execute-api.eu-central-1.amazonaws.com/dev';
-  private websocket: WebSocket | null = null;
+  private tasksApiService = inject(TasksApiService);
 
   private generateRandomTaskId(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -41,47 +39,20 @@ export class TasksStoreState {
   }
 
   private initializeWebSocket(): void {
-    try {
-      this.websocket = new WebSocket(this.websocketUrl);
+    this.tasksApiService.initializeWebSocket(
+      (message: WebSocketMessage) => {
+        console.log('Processing taskUpdated event for taskId:', message.taskId);
+        const { taskId, data: { new: newTaskData } } = message;
 
-      this.websocket.onopen = (event) => {
-        console.log('WebSocket connected:', event);
-      };
-
-      this.websocket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log('Parsed WebSocket data:', data);
-
-          // Handle taskUpdated event
-          if (data.event === 'taskUpdated') {
-            console.log('Processing taskUpdated event for taskId:', data.taskId);
-            const { taskId, data: { new: newTaskData } } = data;
-
-            this.store?.dispatch(new TasksStoreActions.UpdateTask({
-              taskId,
-              ...newTaskData
-            }));
-          }
-        } catch (error) {
-          console.log('Non-JSON WebSocket message:', event.data);
-        }
-      };
-
-      this.websocket.onclose = (event) => {
-        console.log('WebSocket disconnected:', event);
-        setTimeout(() => {
-          console.log('Attempting to reconnect WebSocket...');
-          this.initializeWebSocket();
-        }, 3000);
-      };
-
-      this.websocket.onerror = (error) => {
+        this.store?.dispatch(new TasksStoreActions.UpdateTask({
+          taskId,
+          ...newTaskData
+        }));
+      },
+      (error: Event) => {
         console.error('WebSocket error:', error);
-      };
-    } catch (error) {
-      console.error('Failed to initialize WebSocket:', error);
-    }
+      }
+    );
   }
 
   @Selector()
@@ -152,15 +123,16 @@ export class TasksStoreState {
   async refreshTasks(ctx: StateContext<TasksStoreStateModel>) {
     ctx.patchState({ isLoading: true });
 
-    try {
-      const tasks = await firstValueFrom(this.http.get<Task[]>(this.apiUrl));
+    const result = await tryCatch(firstValueFrom(this.tasksApiService.getTasks()));
+
+    if (result.error === null) {
       ctx.patchState({
-        tasks: tasks,
+        tasks: result.data,
         isLoading: false
       });
-      console.log('Tasks refreshed from API:', tasks);
-    } catch (error) {
-      console.error('Error refreshing tasks from API:', error);
+      console.log('Tasks refreshed from API:', result.data);
+    } else {
+      console.error('Error refreshing tasks from API:', result.error);
       ctx.patchState({
         isLoading: false
       });
@@ -173,17 +145,18 @@ export class TasksStoreState {
     const taskId = this.generateRandomTaskId();
     const taskData = { taskId, answer: payload.answer };
 
-    try {
-      const response = await firstValueFrom(this.http.post<Task>(this.apiUrl, taskData));
-      console.log('Task posted successfully:', response);
+    const result = await tryCatch(firstValueFrom(this.tasksApiService.createTask(taskData)));
+
+    if (result.error === null) {
+      console.log('Task posted successfully:', result.data);
 
       const state = ctx.getState();
       ctx.patchState({
-        tasks: [...state.tasks, response],
+        tasks: [...state.tasks, result.data],
         isLoading: false
       });
-    } catch (error) {
-      console.error('Error posting task:', error);
+    } else {
+      console.error('Error posting task:', result.error);
       ctx.patchState({ isLoading: false });
     }
   }
@@ -203,5 +176,12 @@ export class TasksStoreState {
       task.taskId === payload.taskId ? { ...task, ...payload } : task
     );
     ctx.patchState({ tasks: updatedTasks });
+  }
+
+  /**
+   * Clean up WebSocket connection when store is destroyed
+   */
+  ngOnDestroy(): void {
+    this.tasksApiService.closeWebSocket();
   }
 }

@@ -4,6 +4,7 @@ import { Store } from '@ngxs/store';
 import { AsyncPipe } from '@angular/common';
 import { TasksStoreActions } from '../../tasks-store/tasks-store.actions';
 import { TasksStoreState } from '../../tasks-store/tasks-store.state';
+import { tryCatch } from '../../utils/try-catch';
 
 @Component({
   selector: 'app-tasks-submission-form',
@@ -29,14 +30,15 @@ export class TasksSubmissionForm {
     if (this.taskForm.valid) {
       const answer = this.taskForm.get('answer')?.value;
       if (answer) {
-        try {
-          // Post task with generated ID
-          await this.store.dispatch(new TasksStoreActions.PostTask({ taskId: '', answer })).toPromise();
+        const result = await tryCatch(
+          this.store.dispatch(new TasksStoreActions.PostTask({ taskId: '', answer })).toPromise()
+        );
 
+        if (result.error === null) {
           // Reset form after successful submission
           this.taskForm.reset();
-        } catch (error) {
-          console.error('Error submitting task:', error);
+        } else {
+          console.error('Error submitting task:', result.error);
         }
       }
     }
