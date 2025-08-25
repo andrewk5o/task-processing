@@ -22,8 +22,8 @@ export interface WebSocketMessage {
 export class TasksApiService {
   private http = inject(HttpClient);
 
-  private readonly apiUrl = 'https://3wi511nd5l.execute-api.eu-central-1.amazonaws.com/tasks';
-  private readonly websocketUrl = 'wss://gdz9fe6zra.execute-api.eu-central-1.amazonaws.com/dev';
+  private readonly apiUrl = 'https://hnm3xzviza.execute-api.eu-central-1.amazonaws.com/tasks';
+  private readonly websocketUrl = 'wss://1oia789am4.execute-api.eu-central-1.amazonaws.com';
 
   private websocket: WebSocket | null = null;
 

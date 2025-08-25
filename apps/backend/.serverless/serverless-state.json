@@ -314,7 +314,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-eu-central-1-54517477-9e0a",
-                "S3Key": "serverless/task-processing-backend/dev/1756129229288-2025-08-25T13:40:29.288Z/task-processing-backend.zip"
+                "S3Key": "serverless/task-processing-backend/dev/1756129769295-2025-08-25T13:49:29.295Z/task-processing-backend.zip"
               },
               "Handler": "functions/api/index.handler",
               "Runtime": "nodejs20.x",
@@ -349,7 +349,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-eu-central-1-54517477-9e0a",
-                "S3Key": "serverless/task-processing-backend/dev/1756129229288-2025-08-25T13:40:29.288Z/task-processing-backend.zip"
+                "S3Key": "serverless/task-processing-backend/dev/1756129769295-2025-08-25T13:49:29.295Z/task-processing-backend.zip"
               },
               "Handler": "functions/taskProcessor/index.handler",
               "Runtime": "nodejs20.x",
@@ -384,7 +384,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-eu-central-1-54517477-9e0a",
-                "S3Key": "serverless/task-processing-backend/dev/1756129229288-2025-08-25T13:40:29.288Z/task-processing-backend.zip"
+                "S3Key": "serverless/task-processing-backend/dev/1756129769295-2025-08-25T13:49:29.295Z/task-processing-backend.zip"
               },
               "Handler": "functions/streamProcessor/index.handler",
               "Runtime": "nodejs20.x",
@@ -419,7 +419,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-eu-central-1-54517477-9e0a",
-                "S3Key": "serverless/task-processing-backend/dev/1756129229288-2025-08-25T13:40:29.288Z/task-processing-backend.zip"
+                "S3Key": "serverless/task-processing-backend/dev/1756129769295-2025-08-25T13:49:29.295Z/task-processing-backend.zip"
               },
               "Handler": "functions/dlqMonitor/index.handler",
               "Runtime": "nodejs20.x",
@@ -454,7 +454,7 @@
             "Properties": {
               "Code": {
                 "S3Bucket": "serverless-framework-deployments-eu-central-1-54517477-9e0a",
-                "S3Key": "serverless/task-processing-backend/dev/1756129229288-2025-08-25T13:40:29.288Z/task-processing-backend.zip"
+                "S3Key": "serverless/task-processing-backend/dev/1756129769295-2025-08-25T13:49:29.295Z/task-processing-backend.zip"
               },
               "Handler": "functions/websocketHandler/index.handler",
               "Runtime": "nodejs20.x",
@@ -1336,7 +1336,7 @@
     "artifact": "/Users/andriikliuiko/Desktop/Projects/task-processing/apps/backend/.serverless/task-processing-backend.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/task-processing-backend/dev/1756129229288-2025-08-25T13:40:29.288Z",
+    "artifactDirectoryName": "serverless/task-processing-backend/dev/1756129769295-2025-08-25T13:49:29.295Z",
     "artifact": "task-processing-backend.zip"
   }
 }
