@@ -1,0 +1,6 @@
+.DS_Store
+.cursor/
+.serverless/
+**/node_modules
+**/dist
+**/.angular
