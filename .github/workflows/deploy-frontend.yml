@@ -71,28 +71,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Get CloudFront distribution ID
-        id: get-distribution
-        run: |
-          echo "Looking for CloudFront distributions..."
-          aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Comment:Comment,Origins:Origins.Items[0].DomainName}" --output table
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?contains(Origins.Items[0].DomainName, 'task-processing-frontend-${{ github.event.inputs.stage || 'dev' }}')].Id" --output text)
-          echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
-          echo "Distribution ID: $DISTRIBUTION_ID"
-
-      - name: Invalidate CloudFront cache
-        if: steps.get-distribution.outputs.distribution_id != ''
-        run: |
-          aws cloudfront create-invalidation --distribution-id ${{ steps.get-distribution.outputs.distribution_id }} --paths "/*"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
       - name: Deployment summary
         run: |
           echo "✅ Frontend deployment completed!"
           echo "🌐 Stage: ${{ github.event.inputs.stage || 'dev' }}"
           echo "📁 Build output: apps/frontend/dist/speaknow-test-task/browser"
-          if [ "${{ steps.get-distribution.outputs.distribution_id }}" != "" ]; then
-            echo "🔄 CloudFront cache invalidated for distribution: ${{ steps.get-distribution.outputs.distribution_id }}"
-          fi
