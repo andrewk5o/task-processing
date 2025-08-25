@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { Task } from '../components/tasks-table/tasks-table';
+import { environment } from '../../environments/environment';
 
 export interface CreateTaskRequest {
   taskId: string;
@@ -22,8 +23,8 @@ export interface WebSocketMessage {
 export class TasksApiService {
   private http = inject(HttpClient);
 
-  private readonly apiUrl = 'https://hnm3xzviza.execute-api.eu-central-1.amazonaws.com/tasks';
-  private readonly websocketUrl = 'wss://1oia789am4.execute-api.eu-central-1.amazonaws.com';
+  private readonly apiUrl = `${environment.apiUrl}/tasks`;
+  private readonly websocketUrl = environment.websocketUrl;
 
   private websocket: WebSocket | null = null;
 

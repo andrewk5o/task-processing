@@ -1,0 +1,101 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/frontend/**"
+      - ".github/workflows/deploy-frontend.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/frontend/**"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Deployment stage"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  NODE_VERSION: "20"
+  AWS_REGION: "eu-central-1"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: apps/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd apps/frontend
+          npm ci
+
+      - name: Build Angular app
+        run: |
+          cd apps/frontend
+          npm run build -- --configuration=production
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install Serverless Framework
+        run: |
+          npm install -g serverless
+
+      - name: Install serverless-finch
+        run: |
+          cd apps/frontend
+          npm install --save-dev serverless-finch
+
+      - name: Deploy to S3 using serverless-finch
+        run: |
+          cd apps/frontend
+          serverless client deploy --stage ${{ github.event.inputs.stage || 'dev' }} --no-confirm
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get CloudFront distribution ID
+        id: get-distribution
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?contains(Origins.Items[0].DomainName, 'task-processing-frontend-${{ github.event.inputs.stage || 'dev' }}-frontend')].Id" --output text)
+          echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
+          echo "Distribution ID: $DISTRIBUTION_ID"
+
+      - name: Invalidate CloudFront cache
+        if: steps.get-distribution.outputs.distribution_id != ''
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ steps.get-distribution.outputs.distribution_id }} --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Deployment summary
+        run: |
+          echo "✅ Frontend deployment completed!"
+          echo "🌐 Stage: ${{ github.event.inputs.stage || 'dev' }}"
+          echo "📁 Build output: apps/frontend/dist/speaknow-test-task/browser"
+          if [ "${{ steps.get-distribution.outputs.distribution_id }}" != "" ]; then
+            echo "🔄 CloudFront cache invalidated for distribution: ${{ steps.get-distribution.outputs.distribution_id }}"
+          fi
