@@ -50,7 +50,7 @@ jobs:
       - name: Build Angular app
         run: |
           cd apps/frontend
-          npm run build -- --configuration=production
+          npm run build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -79,7 +79,7 @@ jobs:
       - name: Get CloudFront distribution ID
         id: get-distribution
         run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?contains(Origins.Items[0].DomainName, 'task-processing-frontend-${{ github.event.inputs.stage || 'dev' }}-frontend')].Id" --output text)
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?contains(Origins.Items[0].DomainName, 'task-processing-frontend-${{ github.event.inputs.stage || 'dev' }}')].Id" --output text)
           echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
           echo "Distribution ID: $DISTRIBUTION_ID"
 
