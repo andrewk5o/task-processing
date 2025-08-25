@@ -71,7 +71,7 @@ jobs:
       - name: Deploy to S3 using serverless-finch
         run: |
           cd apps/frontend
-          serverless client deploy --stage ${{ github.event.inputs.stage || 'dev' }} --no-confirm
+          npx serverless client deploy --stage ${{ github.event.inputs.stage || 'dev' }} --no-confirm
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
