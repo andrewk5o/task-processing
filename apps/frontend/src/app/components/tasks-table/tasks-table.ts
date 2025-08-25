@@ -39,17 +39,19 @@ export class TasksTable implements OnDestroy {
   shouldShowTable = this.store.select(TasksStoreState.shouldShowTable);
   shouldShowCards = this.store.select(TasksStoreState.shouldShowCards);
 
+  private boundHandleResize = this.handleResize.bind(this);
+
   constructor() {
     // Only run on browser platform
     if (isPlatformBrowser(this.platformId)) {
       this.handleResize();
-      window.addEventListener('resize', this.handleResize);
+      window.addEventListener('resize', this.boundHandleResize);
     }
   }
 
   ngOnDestroy() {
     if (isPlatformBrowser(this.platformId)) {
-      window.removeEventListener('resize', this.handleResize);
+      window.removeEventListener('resize', this.boundHandleResize);
     }
   }
 

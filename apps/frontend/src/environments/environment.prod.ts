@@ -1,5 +1,5 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://kdkjdo94yk.execute-api.eu-central-1.amazonaws.com',
-    websocketUrl: 'wss://qoypeivwk2.execute-api.eu-central-1.amazonaws.com/dev'
+    apiUrl: 'https://iebcm5vwqf.execute-api.eu-central-1.amazonaws.com',
+    websocketUrl: 'wss://lucuc8j0qh.execute-api.eu-central-1.amazonaws.com/dev'
 };

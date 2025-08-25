@@ -93,6 +93,8 @@ provider:
     TASKS_TABLE: ${self:service}-${sls:stage}-table
     TASKS_QUEUE_URL:
       Ref: TasksQueue
+    TASKS_DLQ_URL:
+      Ref: TasksDeadLetterQueue
     CONNECTIONS_TABLE: ${self:service}-${sls:stage}-websocket-connections
     WEBSOCKET_ENDPOINT:
       Fn::Sub: "wss://${WebsocketsApi}.execute-api.${AWS::Region}.amazonaws.com/${sls:stage}"
@@ -162,10 +164,10 @@ resources:
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: taskId
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: taskId
             KeyType: HASH
 
     # SQS queue for task processing
