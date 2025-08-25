@@ -13,6 +13,7 @@ provider:
     cors:
       allowedOrigins:
         - http://localhost:4200
+        - http://task-processing-frontend-dev.s3-website.eu-central-1.amazonaws.com
       allowedHeaders:
         - Content-Type
         - X-Amz-Date
