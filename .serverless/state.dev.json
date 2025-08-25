@@ -1,0 +1,17 @@
+{
+  "service": {
+    "id": "jippka"
+  },
+  "components": {
+    "backend": {
+      "state": {
+        "detectedFrameworkVersion": "3.40.0"
+      }
+    },
+    "frontend": {
+      "state": {
+        "detectedFrameworkVersion": "3.40.0"
+      }
+    }
+  }
+}

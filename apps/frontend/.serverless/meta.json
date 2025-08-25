@@ -1,0 +1,176 @@
+{
+  "/Users/andriikliuiko/Desktop/Projects/task-processing/apps/frontend/serverless.yml": {
+    "versionFramework": "4.18.1",
+    "servicePath": "/Users/andriikliuiko/Desktop/Projects/task-processing/apps/frontend/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "org": "andrewk5o",
+      "app": "task-processing",
+      "service": "task-processing-frontend",
+      "plugins": [
+        "serverless-finch"
+      ],
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs20.x",
+        "region": "eu-central-1",
+        "stage": "dev",
+        "versionFunctions": true
+      },
+      "custom": {
+        "client": {
+          "bucketName": "task-processing-frontend-dev",
+          "distributionFolder": "dist/speaknow-test-task/browser",
+          "indexDocument": "index.html",
+          "errorDocument": "index.html",
+          "objectHeaders": {
+            "ALL_OBJECTS": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              }
+            ],
+            "*.html": [
+              {
+                "name": "Cache-Control",
+                "value": "no-cache, no-store, must-revalidate"
+              },
+              {
+                "name": "Content-Type",
+                "value": "text/html"
+              }
+            ],
+            "*.js": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/javascript"
+              }
+            ],
+            "*.css": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "text/css"
+              }
+            ],
+            "*.svg": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "image/svg+xml"
+              }
+            ],
+            "*.ico": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "image/x-icon"
+              }
+            ],
+            "*.png": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "image/png"
+              }
+            ],
+            "*.jpg": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "image/jpeg"
+              }
+            ],
+            "*.woff": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "font/woff"
+              }
+            ],
+            "*.woff2": [
+              {
+                "name": "Cache-Control",
+                "value": "public, max-age=31536000"
+              },
+              {
+                "name": "Content-Type",
+                "value": "font/woff2"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs20.x",
+      "region": "eu-central-1",
+      "stage": "dev",
+      "versionFunctions": true
+    },
+    "dashboard": {
+      "isEnabledForService": true,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": {
+        "providers": true,
+        "monitoring": true
+      },
+      "orgObservabilityIntegrations": [
+        {
+          "integrationId": "oJdKQagvGtLEo2SytTKFa4",
+          "awsAccountId": "085089485325",
+          "status": "alive"
+        }
+      ],
+      "serviceAppId": "fWVrLq7M0jppR2ssVh",
+      "serviceProvider": {
+        "accessKeyId": "<REDACTED>",
+        "secretAccessKey": "<REDACTED>",
+        "sessionToken": "<REDACTED>",
+        "$source": {
+          "CREDENTIALS_CODE": "<REDACTED>"
+        }
+      },
+      "instanceParameters": null
+    },
+    "serviceRawFile": "# Frontend Serverless Framework configuration for task-processing service\norg: andrewk5o\napp: task-processing\nservice: task-processing-frontend\n\nplugins:\n  - serverless-finch\n\n# Stage-specific configuration\nprovider:\n  name: aws\n  runtime: nodejs20.x\n  region: eu-central-1\n\n# Custom configuration for Angular app deployment\ncustom:\n  client:\n    bucketName: ${self:service}-${sls:stage}\n    distributionFolder: dist/speaknow-test-task/browser\n    indexDocument: index.html\n    errorDocument: index.html\n    objectHeaders:\n      ALL_OBJECTS:\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n      \"*.html\":\n        - name: Cache-Control\n          value: \"no-cache, no-store, must-revalidate\"\n        - name: Content-Type\n          value: \"text/html\"\n      \"*.js\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"application/javascript\"\n      \"*.css\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"text/css\"\n      \"*.svg\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"image/svg+xml\"\n      \"*.ico\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"image/x-icon\"\n      \"*.png\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"image/png\"\n      \"*.jpg\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"image/jpeg\"\n      \"*.woff\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"font/woff\"\n      \"*.woff2\":\n        - name: Cache-Control\n          value: \"public, max-age=31536000\"\n        - name: Content-Type\n          value: \"font/woff2\"\n",
+    "command": [
+      "client",
+      "deploy"
+    ],
+    "options": {},
+    "orgId": "89b643ef-0e63-40f6-8b92-5e6cd7c189b4",
+    "orgName": "andrewk5o",
+    "userId": "xpqzC5Rwr5x9zmTG9W",
+    "userName": "andrewk5o",
+    "serviceProviderAwsAccountId": "085089485325",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}

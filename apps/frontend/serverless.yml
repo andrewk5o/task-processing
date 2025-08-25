@@ -1,0 +1,70 @@
+# Frontend Serverless Framework configuration for task-processing service
+org: andrewk5o
+app: task-processing
+service: task-processing-frontend
+
+plugins:
+  - serverless-finch
+
+# Stage-specific configuration
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-central-1
+
+# Custom configuration for Angular app deployment
+custom:
+  client:
+    bucketName: ${self:service}-${sls:stage}
+    distributionFolder: dist/speaknow-test-task/browser
+    indexDocument: index.html
+    errorDocument: index.html
+    objectHeaders:
+      ALL_OBJECTS:
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+      "*.html":
+        - name: Cache-Control
+          value: "no-cache, no-store, must-revalidate"
+        - name: Content-Type
+          value: "text/html"
+      "*.js":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "application/javascript"
+      "*.css":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "text/css"
+      "*.svg":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "image/svg+xml"
+      "*.ico":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "image/x-icon"
+      "*.png":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "image/png"
+      "*.jpg":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "image/jpeg"
+      "*.woff":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "font/woff"
+      "*.woff2":
+        - name: Cache-Control
+          value: "public, max-age=31536000"
+        - name: Content-Type
+          value: "font/woff2"
